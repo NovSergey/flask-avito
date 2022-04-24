@@ -1,0 +1,29 @@
+.image{
+    padding-top: 15px;
+    padding-right: 15px;
+    padding-left: 0;
+    height: 55%;
+    width: 105%;
+}
+.item{
+    width: 400px; /*ширина*/
+    height: 418px; /*высота*/
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    display: inline-block;
+}
+.items{
+    width: 1215px;
+    padding-top: 10px;
+    padding-left: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+.goods{
+    width: 1215px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.form-control-control{
+    margin-bottom: 16px
+}

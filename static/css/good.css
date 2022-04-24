@@ -1,0 +1,11 @@
+.buy{
+	display: inline-block;
+}
+.image{
+    width: 600px;
+	height: 400px;
+}
+.items_buy{
+	display: block;
+	margin-bottom: 20px;
+}
