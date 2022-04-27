@@ -37,6 +37,7 @@
     margin-right: 6px;
     border-bottom-right-radius: 0px;
     border-top-right-radius: 0px;
+    text-align: left
 }
 .input:hover{
     background-color: white;
@@ -60,4 +61,7 @@
     border-bottom-left-radius: 0px;
     border-top-left-radius: 0px;
     box-shadow:0 0 0 .2rem rgba(38,143,255,.5)
+}
+.item h2{
+    text-transform: capitalize;
 }

@@ -75,7 +75,7 @@ def index():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         a = form.title.data.lower()
-        goods = db_sess.query(Goods).filter(func.lower(Goods.title)==func.lower(form.title.data)).all()
+        goods = db_sess.query(Goods).filter(Goods.title == form.title.data.lower()).all()
         #goods = db_sess.query(Goods).filter(Goods.title.ilike(f"%{form.title.data}%")).all()
         print(goods)
         return render_template("index.html", news=goods, title="Авито2.0", form=form)
@@ -151,7 +151,7 @@ def add_news():
         form.file.data.save(UPLOAD_PATH + filename) #сохранение каринки
         db_sess = db_session.create_session()
         goods = Goods()
-        goods.title = form.title.data
+        goods.title = form.title.data.lower()
         goods.description = form.description.data
         goods.price = form.price.data
         goods.picture = f"images/{filename}"
