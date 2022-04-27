@@ -1,18 +1,22 @@
 import datetime
 import os
+from sqlalchemy import func
 from flask_restful import reqparse, abort, Api, Resource
-from flask import Flask, render_template, request, flash, url_for
+from flask import Flask, render_template, request, flash, url_for,session
+
 from os import getenv
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.exceptions import abort
-
+from flask_bootstrap import Bootstrap
 #import news_resources
 from data import db_session
 from data.goods import Goods
 from data.users import User
 from data.category import Category
 from forms.goods import GoodsForm
+from forms.index import IndexForm
 from forms.user import RegisterForm, LoginForm
+from wtforms import SubmitField
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask import url_for, redirect, render_template, send_file
 from werkzeug.utils import secure_filename
@@ -25,7 +29,8 @@ login_manager.init_app(app)
 app.config['SECRET_KEY'] = getenv('SECRET_KEY')
 
 UPLOAD_PATH = 'static/images/'
-
+REMOVE_PATH = 'static/'
+Bootstrap(app)
 
 # # для списка объектов
 # api.add_resource(news_resources.NewsListResource, '/api/v2/goods')
@@ -37,39 +42,52 @@ def add_category():
     categories = db_sess.query(Category)
     try:
         user = Category(
+            id=1,
             name="Машинка"
         )
         db_sess.add(user)
         user2 = Category(
+            id=2,
             name="Верталёт"
         )
         db_sess.add(user2)
         user3 = Category(
+            id=3,
             name="Трактор"
         )
         db_sess.add(user3)
         user4 = Category(
+            id=4,
             name="Грузовик"
         )
         db_sess.add(user4)
         user5 = Category(
+            id=5,
             name="Самолёт"
         )
         db_sess.add(user5)
         db_sess.commit()
     except:
         pass
-
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def index():
+    form = IndexForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        a = form.title.data.lower()
+        goods = db_sess.query(Goods).filter(func.lower(Goods.title)==func.lower(form.title.data)).all()
+        #goods = db_sess.query(Goods).filter(Goods.title.ilike(f"%{form.title.data}%")).all()
+        print(goods)
+        return render_template("index.html", news=goods, title="Авито2.0", form=form)
     db_sess = db_session.create_session()
-    news = db_sess.query(Goods)
-    return render_template("index.html", news=news, title="Авито2.0")
+    goods = db_sess.query(Goods)
+    return render_template("index.html", news=goods, title="Авито2.0", form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
 def reqister():
     form = RegisterForm()
     if form.validate_on_submit():
+        session['phone'] = form.phone.data
         if form.password.data != form.password_again.data:
             return render_template('register.html', title='Регистрация',
                                 form=form,
@@ -137,16 +155,23 @@ def add_news():
         goods.description = form.description.data
         goods.price = form.price.data
         goods.picture = f"images/{filename}"
-        goods.category = form.category.data
-        name = db_sess.query(Category).filter(Category.name == form.category.data).first()
-        goods.categories.append(name)
-        print(goods)
+        # name = db_sess.query(Category).filter(Category.name == form.category.data).first()
+        # goods.categories.append(name)
         current_user.goods.append(goods)
         db_sess.merge(current_user)
         db_sess.commit()
         return redirect('/')
     return render_template('goods.html', title='Добавление товара',
                            form=form)
+# @app.route("/find", methods=['GET', 'POST'])
+# def find_category():
+#     form = IndexForm()
+#     db_sess = db_session.create_session()
+#     goods = db_sess.query(Goods).filter(Goods.title == title).all()
+#     return render_template("index.html", news=goods, title="Авито2.0", form=form)
+
+    # db_sess = db_session.create_session()
+    # return db_sess.query(Category).filter(Category.name == name).first()
 
 @app.route('/news/<int:id>', methods=['GET', 'POST'])
 @login_required
@@ -172,6 +197,10 @@ def edit_news(id):
             news.title = form.title.data
             news.description = form.description.data
             news.price = form.price.data
+            filename = secure_filename(form.file.data.filename)  # сохранение каринки
+            form.file.data.save(UPLOAD_PATH + filename)  # сохранение каринки
+            os.remove(REMOVE_PATH + news.picture)
+            news.picture = f"images/{filename}"
             db_sess.commit()
             return redirect('/')
         else:
@@ -190,20 +219,37 @@ def news_delete(id):
                                       ).first()
     # cat = db_sess.query(Category).filter(Category.id == id).first()
     if news:
+        os.remove(REMOVE_PATH+news.picture)
         db_sess.delete(news)
         # db_sess.delete(cat)
         db_sess.commit()
     else:
         abort(404)
     return redirect('/')
-
+@app.route('/good_buy/<int:id>', methods=['GET', 'POST'])
+@login_required
+def good_buy(id):
+    db_sess = db_session.create_session()
+    news = db_sess.query(Goods).filter(Goods.id == id,
+                                      Goods.user == current_user
+                                      ).first()
+    # cat = db_sess.query(Category).filter(Category.id == id).first()
+    if news:
+        db_sess.delete(news)
+        # db_sess.delete(cat)
+        db_sess.commit()
+    else:
+        abort(404)
+    return redirect('/')
 @app.route('/news_info/<int:id>', methods=['GET', 'POST'])
 def news_info(id):
     db_sess = db_session.create_session()
     news = db_sess.query(Goods).filter(Goods.id == id).first()
+    tel = db_sess.query(User).filter(User.id == news.user_id).first()
     return render_template('good.html',
                            news=news,
-                           title='Товар')
+                           title='Товар',
+                           tel=tel)
 
 @app.route('/logout')
 @login_required
@@ -218,10 +264,9 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 def main():
-    import socket
     db_session.global_init("db/avito.db")
     add_category()
-    app.run(host="127.0.0.1", port=5595, debug=True)
+    app.run(host="0.0.0.0", port=5595)
 
 
 if __name__ == '__main__':

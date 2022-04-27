@@ -8,8 +8,8 @@
   <div class="buy">
     <img src="{{ url_for('static', filename=news.picture) }}" class="image">
     <div class="buy">
-      <a href="/" class="btn btn-primary items_buy"><h1>Купить</h1></a>
-      <a href="/" class="btn btn-primary items_buy"><h1>Узнать номер</h1></a>
+      <a href="/good_buy/{{ news.id }}" class="btn btn-primary items_buy"><h1>Купить</h1></a>
+      <a href="#" class="btn btn-primary items_buy"><h1>+{{tel.phone}}</h1></a>
     </div>
   </div>
   <div>

@@ -19,6 +19,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                                      default=datetime.datetime.now)
     phone = sqlalchemy.Column(sqlalchemy.Integer, nullable=True, unique=True)
     rating = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
+
     goods = orm.relation("Goods", back_populates='user')
 
     def set_password(self, password):
@@ -28,4 +29,4 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         return check_password_hash(self.hashed_password, password)
 
     def __repr__(self):
-        return f"USER - {self.name}, {self.about}, {self.email}"
+        return f"USER - {self.id}, {self.name}, {self.email}, {self.created_date}, {self.phone}, {self.rating}"

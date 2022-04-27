@@ -27,3 +27,37 @@
 .form-control-control{
     margin-bottom: 16px
 }
+.input{
+    width: 500px;
+    height: 38px;
+    color: black;
+    background-color: white;
+    box-shadow:0 0 0 .2rem rgba(38,143,255,.5);
+    border-color: white;
+    margin-right: 6px;
+    border-bottom-right-radius: 0px;
+    border-top-right-radius: 0px;
+}
+.input:hover{
+    background-color: white;
+    border-color: white;
+    color: black;
+}
+.input:focus{
+    background-color: white;
+    border-color: white;
+    color: black;
+}
+.input:not(:disabled):not(.disabled).active, .input:not(:disabled):not(.disabled):active, .show>.input.dropdown-toggle {
+    background-color: white;
+    border-color: white;
+    color: black;
+}
+.find p{
+    text-align: center;
+}
+.btn_find{
+    border-bottom-left-radius: 0px;
+    border-top-left-radius: 0px;
+    box-shadow:0 0 0 .2rem rgba(38,143,255,.5)
+}

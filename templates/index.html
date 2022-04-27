@@ -2,12 +2,21 @@
 
 
 {% block items %}
+
 <div class="goods">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-  <h1>Товары</h1>
-  {% if current_user.is_authenticated %}
-  <a href="news" class="btn btn-secondary">Добавить Товар</a>
-  {% endif %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<form action="" method="post" name="find">
+  {{ form.csrf_token }}
+  <div class="find">
+    <p>
+      {{ form.title(class="form-control input btn-primary btn") }}{{ form.submit(type="submit", class="btn btn-primary btn_find") }}
+    </p>
+  </div>
+</form>
+<h1>Товары</h1>
+{% if current_user.is_authenticated %}
+<a href="news" class="btn btn-secondary">Добавить Товар</a>
+{% endif %}
 </div>
 <div class="items">
   {% for item in news%}
