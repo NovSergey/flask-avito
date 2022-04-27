@@ -18,8 +18,9 @@ class Goods(SqlAlchemyBase, SerializerMixin):
                                 sqlalchemy.ForeignKey("users.id"))
     price = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
 
-    created_date = sqlalchemy.Column(sqlalchemy.DateTime,
-                                     default=datetime.datetime.now)
+    created_date = sqlalchemy.Column(sqlalchemy.Integer,
+                                     default=datetime.date.today())
+    category = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
     categories =orm.relation("Category",
                               secondary="association",

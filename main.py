@@ -1,11 +1,9 @@
-import datetime
 import os
-from sqlalchemy import func
-from flask_restful import reqparse, abort, Api, Resource
-from flask import Flask, render_template, request, flash, url_for,session
+from flask_restful import abort, Api
+from flask import Flask, request, session
+from data import category
 
 from os import getenv
-from werkzeug.utils import redirect, secure_filename
 from werkzeug.exceptions import abort
 from flask_bootstrap import Bootstrap
 #import news_resources
@@ -16,9 +14,8 @@ from data.category import Category
 from forms.goods import GoodsForm
 from forms.index import IndexForm
 from forms.user import RegisterForm, LoginForm
-from wtforms import SubmitField
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from flask import url_for, redirect, render_template, send_file
+from flask import redirect, render_template
 from werkzeug.utils import secure_filename
 app = Flask(__name__, static_folder="static")
 
@@ -39,7 +36,6 @@ Bootstrap(app)
 
 def add_category():
     db_sess = db_session.create_session()
-    categories = db_sess.query(Category)
     try:
         user = Category(
             id=1,
@@ -74,10 +70,9 @@ def index():
     form = IndexForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        a = form.title.data.lower()
-        goods = db_sess.query(Goods).filter(Goods.title == form.title.data.lower()).all()
-        #goods = db_sess.query(Goods).filter(Goods.title.ilike(f"%{form.title.data}%")).all()
-        print(goods)
+        goods = db_sess.query(Goods).filter(Goods.title == form.title.data.lower(),
+                                            Goods.category == form.category.data).all()
+
         return render_template("index.html", news=goods, title="Авито2.0", form=form)
     db_sess = db_session.create_session()
     goods = db_sess.query(Goods)
@@ -149,29 +144,20 @@ def add_news():
     if form.validate_on_submit():
         filename = secure_filename(form.file.data.filename) #сохранение каринки
         form.file.data.save(UPLOAD_PATH + filename) #сохранение каринки
-        db_sess = db_session.create_session()
         goods = Goods()
         goods.title = form.title.data.lower()
         goods.description = form.description.data
         goods.price = form.price.data
         goods.picture = f"images/{filename}"
-        # name = db_sess.query(Category).filter(Category.name == form.category.data).first()
-        # goods.categories.append(name)
+        goods.category = form.category.data
         current_user.goods.append(goods)
-        db_sess.merge(current_user)
+        db_sess = db_session.create_session()
+        name = db_sess.query(Category).filter(Category.name == form.category.data).first()
+        goods.categories.append(name)
         db_sess.commit()
         return redirect('/')
     return render_template('goods.html', title='Добавление товара',
                            form=form)
-# @app.route("/find", methods=['GET', 'POST'])
-# def find_category():
-#     form = IndexForm()
-#     db_sess = db_session.create_session()
-#     goods = db_sess.query(Goods).filter(Goods.title == title).all()
-#     return render_template("index.html", news=goods, title="Авито2.0", form=form)
-
-    # db_sess = db_session.create_session()
-    # return db_sess.query(Category).filter(Category.name == name).first()
 
 @app.route('/news/<int:id>', methods=['GET', 'POST'])
 @login_required

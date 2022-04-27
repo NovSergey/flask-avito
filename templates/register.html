@@ -13,7 +13,7 @@
         {% endfor %}
     </p>
     <p>
-        {{ form.phone.label }}<br>
+        {{ form.phone.label }}
         {{ form.phone(class="form-control")}}<br>
         {% for error in form.phone.errors %}
             <p class="alert alert-danger" role="alert">
