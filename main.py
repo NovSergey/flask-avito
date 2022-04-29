@@ -23,7 +23,7 @@ api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-app.config['SECRET_KEY'] = getenv('SECRET_KEY')
+app.config['SECRET_KEY'] = 'fsd'#getenv('SECRET_KEY')
 
 UPLOAD_PATH = 'static/images/'
 REMOVE_PATH = 'static/'
@@ -35,8 +35,8 @@ Bootstrap(app)
 # api.add_resource(news_resources.NewsResource, '/api/v2/goods/<int:goods_id>')
 
 def add_category():
-    db_sess = db_session.create_session()
     try:
+        db_sess = db_session.create_session()
         user = Category(
             id=1,
             name="Машинка"
@@ -142,18 +142,19 @@ def login():
 def add_news():
     form = GoodsForm()
     if form.validate_on_submit():
-        filename = secure_filename(form.file.data.filename) #сохранение каринки
-        form.file.data.save(UPLOAD_PATH + filename) #сохранение каринки
+        db_sess = db_session.create_session()
+        filename = secure_filename(f"{form.title.data.lower()}_{current_user.id}.png") #сохранение каринки
+        form.file.data.save(UPLOAD_PATH + f"{form.title.data.lower()}_{current_user.id}.png") #сохранение каринки
         goods = Goods()
         goods.title = form.title.data.lower()
         goods.description = form.description.data
         goods.price = form.price.data
-        goods.picture = f"images/{filename}"
-        goods.category = form.category.data
+        goods.picture = f"images/{form.title.data.lower()}_{current_user.id}.png"
+        #goods.category = form.category.data
         current_user.goods.append(goods)
-        db_sess = db_session.create_session()
         name = db_sess.query(Category).filter(Category.name == form.category.data).first()
         goods.categories.append(name)
+        db_sess.add(goods)
         db_sess.commit()
         return redirect('/')
     return render_template('goods.html', title='Добавление товара',
