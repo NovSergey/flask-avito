@@ -20,7 +20,7 @@ class Goods(SqlAlchemyBase, SerializerMixin):
 
     created_date = sqlalchemy.Column(sqlalchemy.Integer,
                                      default=datetime.date.today())
-    category = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    #category = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
     categories =orm.relation("Category",
                               secondary="association", backref='Goods', lazy='dynamic')
