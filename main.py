@@ -23,7 +23,7 @@ api = Api(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-app.config['SECRET_KEY'] = 'fsd'#getenv('SECRET_KEY')
+app.config['SECRET_KEY'] = getenv('SECRET_KEY')
 
 UPLOAD_PATH = 'static/images/'
 REMOVE_PATH = 'static/'
