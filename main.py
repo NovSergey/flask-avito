@@ -8,8 +8,8 @@ from werkzeug.exceptions import abort
 from flask_bootstrap import Bootstrap
 #import news_resources
 from data import db_session
-from data.goods import Goods
 from data.users import User
+from data.goods import Goods
 from data.category import Category
 from forms.goods import GoodsForm
 from forms.index import IndexForm
@@ -143,7 +143,6 @@ def add_news():
     form = GoodsForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        filename = secure_filename(f"{form.title.data.lower()}_{current_user.id}.png") #сохранение каринки
         form.file.data.save(UPLOAD_PATH + f"{form.title.data.lower()}_{current_user.id}.png") #сохранение каринки
         goods = Goods()
         goods.title = form.title.data.lower()
@@ -152,9 +151,9 @@ def add_news():
         goods.picture = f"images/{form.title.data.lower()}_{current_user.id}.png"
         #goods.category = form.category.data
         current_user.goods.append(goods)
+        db_sess.commit()
         name = db_sess.query(Category).filter(Category.name == form.category.data).first()
         goods.categories.append(name)
-        db_sess.add(goods)
         db_sess.commit()
         return redirect('/')
     return render_template('goods.html', title='Добавление товара',
@@ -253,7 +252,7 @@ def load_user(user_id):
 def main():
     db_session.global_init("db/avito.db")
     add_category()
-    app.run(host="0.0.0.0", port=5595)
+    app.run()
 
 
 if __name__ == '__main__':

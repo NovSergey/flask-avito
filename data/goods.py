@@ -22,8 +22,8 @@ class Goods(SqlAlchemyBase, SerializerMixin):
                                      default=datetime.date.today())
     #category = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
-    categories =orm.relation("Category",
-                              secondary="association", backref='Goods', lazy='dynamic')
+    categories =relationship("Category",
+                              secondary="association", backref='Goods')
     user = orm.relation('User')
 
     def __repr__(self):
