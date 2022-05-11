@@ -94,3 +94,24 @@
     border-color: white;
     color: black;
 }
+.settings a{
+    text-decoration: none;
+}
+.info{
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    height: calc(1.5em + 0.75rem + 2px);
+    padding: 0.375rem 0.75rem;
+    margin-left: 10px;
+    margin-top: -5px;
+    margin-bottom: 5px;
+}
+.infos{
+    display: flex;
+    margin-top: 0.375rem;
+}
+.settings{
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.75rem;
+}

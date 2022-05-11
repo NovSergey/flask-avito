@@ -13,7 +13,7 @@ from data.goods import Goods
 from data.category import Category
 from forms.goods import GoodsForm
 from forms.index import IndexForm
-from forms.user import RegisterForm, LoginForm
+from forms.user import RegisterForm, LoginForm, EditEmailForm, EditPhoneForm, EditPasswordForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from flask import redirect, render_template
 from werkzeug.utils import secure_filename
@@ -151,7 +151,6 @@ def add_news():
         goods.picture = f"images/{form.title.data.lower()}_{current_user.id}.png"
         #goods.category = form.category.data
         current_user.goods.append(goods)
-        db_sess.commit()
         name = db_sess.query(Category).filter(Category.name == form.category.data).first()
         goods.categories.append(name)
         db_sess.commit()
@@ -236,6 +235,61 @@ def news_info(id):
                            news=news,
                            title='Товар',
                            tel=tel)
+
+@app.route('/options', methods=['GET', 'POST'])
+@login_required
+def options():
+    db_sess = db_session.create_session()
+    info = db_sess.query(User).filter(User.id == current_user.id).first()
+    return render_template('options.html', title='Настройки', info=info)
+
+@app.route('/edit_email', methods=['GET', 'POST'])
+@login_required
+def edit_email():
+    form = EditEmailForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == current_user.id
+                                          ).first()
+        if user:
+            user.email = form.email.data
+            db_sess.commit()
+            return redirect('/')
+        else:
+            abort(404)
+    return render_template('edit_email.html', title='Изменение почты', form=form)
+
+@app.route('/edit_phone', methods=['GET', 'POST'])
+@login_required
+def edit_phone():
+    form = EditPhoneForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == current_user.id
+                                          ).first()
+        if user:
+            user.phone = form.phone.data
+            db_sess.commit()
+            return redirect('/')
+        else:
+            abort(404)
+    return render_template('edit_phone.html', title='Изменение телефона', form=form)
+
+@app.route('/edit_password', methods=['GET', 'POST'])
+@login_required
+def edit_password():
+    form = EditPasswordForm()
+    if form.validate_on_submit():
+        db_sess = db_session.create_session()
+        user = db_sess.query(User).filter(User.id == current_user.id
+                                          ).first()
+        if user and user.check_password(form.password.data):
+            user.set_password(form.new_password.data)
+            db_sess.commit()
+            return redirect('/')
+        else:
+            abort(404)
+    return render_template('edit_password.html', title='Изменение пароля', form=form)
 
 @app.route('/logout')
 @login_required

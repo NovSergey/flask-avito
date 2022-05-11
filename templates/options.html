@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<h1 style="text-align: center;">Настройки</h1>
+<div class="col-md6 settings">
+    <div class="item_info">
+        <div class="infos">
+            Почта: <div class="info">{{info.email}}</div>
+        </div>
+        <a href="/edit_email">Изменить</a>
+    </div>
+    <div class="item_info">
+        <div class="infos">
+            Телефон: <div class="info">+{{info.phone}}</div>
+        </div>
+        <a href="/edit_phone">Изменить</a>
+    </div>
+    <div class="item_info">
+        <div class="infos">
+            Пароль
+        </div>
+        <a href="/edit_password">Изменить</a>
+    </div>
+</div>
+{% endblock %}
